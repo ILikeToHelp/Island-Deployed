@@ -1,0 +1,14 @@
+C:\Users\Patryk\source\repos\Game3.2\IslandDeployed\bin\Debug\IslandDeployed.exe.config
+C:\Users\Patryk\source\repos\Game3.2\IslandDeployed\bin\Debug\IslandDeployed.exe
+C:\Users\Patryk\source\repos\Game3.2\IslandDeployed\bin\Debug\IslandDeployed.pdb
+C:\Users\Patryk\source\repos\Game3.2\IslandDeployed\obj\Debug\IslandDeployed.csprojAssemblyReference.cache
+C:\Users\Patryk\source\repos\Game3.2\IslandDeployed\obj\Debug\IslandDeployed.BaseForm.resources
+C:\Users\Patryk\source\repos\Game3.2\IslandDeployed\obj\Debug\IslandDeployed.MainMenu.resources
+C:\Users\Patryk\source\repos\Game3.2\IslandDeployed\obj\Debug\IslandDeployed.Properties.Resources.resources
+C:\Users\Patryk\source\repos\Game3.2\IslandDeployed\obj\Debug\IslandDeployed.csproj.GenerateResource.cache
+C:\Users\Patryk\source\repos\Game3.2\IslandDeployed\obj\Debug\IslandDeployed.exe
+C:\Users\Patryk\source\repos\Game3.2\IslandDeployed\obj\Debug\IslandDeployed.pdb
+C:\Users\Patryk\source\repos\Game3.2\IslandDeployed\obj\Debug\IslandDeployed.BattleField.resources
+C:\Users\Patryk\source\repos\Game3.2\IslandDeployed\obj\Debug\IslandDeployed.NewGame.resources
+C:\Users\Patryk\source\repos\Game3.2\IslandDeployed\obj\Debug\IslandDeployed.Shop.resources
+C:\Users\Patryk\source\repos\Game3.2\IslandDeployed\obj\Debug\IslandDeployed.SplashScreen.resources
