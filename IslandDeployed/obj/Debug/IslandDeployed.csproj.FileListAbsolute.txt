@@ -12,3 +12,4 @@ C:\Users\Patryk\source\repos\Game3.2\IslandDeployed\obj\Debug\IslandDeployed.Bat
 C:\Users\Patryk\source\repos\Game3.2\IslandDeployed\obj\Debug\IslandDeployed.NewGame.resources
 C:\Users\Patryk\source\repos\Game3.2\IslandDeployed\obj\Debug\IslandDeployed.Shop.resources
 C:\Users\Patryk\source\repos\Game3.2\IslandDeployed\obj\Debug\IslandDeployed.SplashScreen.resources
+C:\Users\Patryk\source\repos\Game3.2\IslandDeployed\obj\Debug\IslandDeployed.Forms.EndGameScreen.resources

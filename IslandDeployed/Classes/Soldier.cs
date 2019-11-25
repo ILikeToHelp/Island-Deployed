@@ -29,6 +29,8 @@ namespace IslandDeployed.Classes
         private int rangeDamage;
         private string type;
         private double health;
+        private readonly int totalHealth;
+        private readonly int accuracy;
         private bool player1Owned;
         public static int countPlayer1;
         public static int countPlayer2;
@@ -53,17 +55,7 @@ namespace IslandDeployed.Classes
         }
         public string Type
         { get { return type; }
-            set
-            {
-                if (value == "Sniper" || value == "Infantry" || value == "Mercenarie")
-                {
-                    type = value;
-                }
-                else
-                {
-                    CalledUndefined();     
-                } 
-            }
+            set { type = value; }
         }
         public double Health
         {
@@ -83,6 +75,32 @@ namespace IslandDeployed.Classes
                     health = value;
                 }
             }
+        }
+        public double GetHealthBar()
+        {
+            // reutrns how many bars of health (one bar = 10% ) to display on 
+            double bar;
+            bar = 10 * health / totalHealth;
+            Math.Round(bar);
+            return bar;
+        }
+        public bool dealDamage()
+        {
+            bool output = false;
+            Random rnd = new Random();
+            int v = 0;
+            v = rnd.Next(1, 101);
+
+            if (v <= accuracy)  //if unit hits then output =true
+            {
+                output = true;
+            }
+            else
+            {                   //if unit misses return false
+                output = false;
+            }
+
+            return output;
         }
         public bool Player1Owned
         { get { return player1Owned; }
@@ -107,14 +125,17 @@ namespace IslandDeployed.Classes
         }
 
         // then, define constructor; using 'a' as a prefix and abreviation for argument
-        public Soldier(int aX, int aY, int aSpeed, int aMeleeDamage, int aRangeDamage, string aType, double aHealth, bool aPlayer1Owned)
+        public Soldier(int aX, int aY, int aSpeed, int aMeleeDamage, int aRangeDamage,
+            int aAccuracy, string aType, double aHealth, int aTotalHealth, bool aPlayer1Owned)
         { 
             position.x = aX; position.y = aY;
+            accuracy = aAccuracy;
             Speed = aSpeed;
             MeleeDamage = aMeleeDamage;
             RangeDamage = aRangeDamage;
             Type = aType;
             Health = aHealth;
+            totalHealth = aTotalHealth;
             Player1Owned = aPlayer1Owned;
 
             if (player1Owned)   // if the unit is owned by player one 
@@ -130,10 +151,7 @@ namespace IslandDeployed.Classes
         { }
         // methods defined below 
         // ------------------------------------ Note to self - method is a function defined within a class - since c# is oop lang then all functions are methods
-        private void CalledUndefined()
-        {
-            throw new NotImplementedException();
-        }
+
 
         // TakeDamage works for both melee and ranged attacks.
         public double TakeDamage(double damage)

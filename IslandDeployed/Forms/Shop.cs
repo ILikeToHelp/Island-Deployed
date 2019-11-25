@@ -14,9 +14,9 @@ namespace IslandDeployed
     public partial class Shop : BaseForm
     {
         int gold = 1000;
-        public static int numberOfSnipers = 0;
-        public static int numberOfMercenaries = 0;
-        public static int numberOfInfantry = 0;
+        public static int numberOfSnipers;
+        public static int numberOfMercenaries;
+        public static int numberOfInfantry;
 
         public Shop()
         {
@@ -24,40 +24,52 @@ namespace IslandDeployed
         }
         private void Shop_Load(object sender, EventArgs e)
         {
+            numberOfInfantry = 0; numberOfMercenaries = 0; numberOfSnipers = 0;
 
             goldLeft.Text = gold.ToString();
             //pictureBox0.MouseHover += pictureBox0_MouseHover;
         }
 
-        private void CanAfford(int cost)
+        private bool CanAfford(int cost)
         {
             if (gold >= cost)
             {
                 gold -= cost;
                 goldLeft.Text = gold.ToString();
+                return true;
             }
             else
             {
                 MessageBox.Show("You don't have enough money.");
+                return false;
             }
         }
 
         private void buyInfantry_Click(object sender, EventArgs e)
         {
-           CanAfford(200);
-            numberOfInfantry++;
+            if (CanAfford(200))
+            {
+                numberOfInfantry++;
+            }
+            
+            
         }
 
         private void buyMercenarie_Click(object sender, EventArgs e)
         {
-            CanAfford(150);
-            numberOfMercenaries++;
+            if (CanAfford(150))
+            {
+                numberOfMercenaries++;
+            }
+            
         }
 
         private void buySniper_Click(object sender, EventArgs e)
         {
-            CanAfford(400);
-            numberOfSnipers++;
+            if (CanAfford(400))
+            {
+                numberOfSnipers++;
+            }
         }
 
 
@@ -70,10 +82,6 @@ namespace IslandDeployed
 
         }
 
-        //private void pictureBox2_MouseHover(object sender, EventArgs e)
-        //{
-        //    ToolTip ToolTip1 = new ToolTip();
-        //    ToolTip1.SetToolTip(pictureBox2, "You have " + numberOfSnipers.ToString() + " Snipers.");
-        //}
+
     }
 }

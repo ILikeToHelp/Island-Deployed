@@ -43,6 +43,7 @@
             this.ActionShot = new System.Windows.Forms.PictureBox();
             this.Skip = new System.Windows.Forms.PictureBox();
             this.ActionMove = new System.Windows.Forms.PictureBox();
+            this.LogOfMoves = new System.Windows.Forms.RichTextBox();
             this.deploymentPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DeploySniper)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.DeployInfantry)).BeginInit();
@@ -70,6 +71,7 @@
             this.deploymentPanel.Name = "deploymentPanel";
             this.deploymentPanel.Size = new System.Drawing.Size(640, 432);
             this.deploymentPanel.TabIndex = 3;
+            this.deploymentPanel.Visible = false;
             // 
             // snipersLeft
             // 
@@ -185,6 +187,7 @@
             this.ActionShot.Size = new System.Drawing.Size(101, 100);
             this.ActionShot.TabIndex = 1;
             this.ActionShot.TabStop = false;
+            this.ActionShot.Click += new System.EventHandler(this.ActionShot_Click);
             // 
             // Skip
             // 
@@ -206,12 +209,24 @@
             this.ActionMove.TabStop = false;
             this.ActionMove.Click += new System.EventHandler(this.ActionMove_Click);
             // 
+            // LogOfMoves
+            // 
+            this.LogOfMoves.BackColor = System.Drawing.SystemColors.InfoText;
+            this.LogOfMoves.Font = new System.Drawing.Font("Neogrey Medium", 9.7F, System.Drawing.FontStyle.Bold);
+            this.LogOfMoves.ForeColor = System.Drawing.Color.Green;
+            this.LogOfMoves.Location = new System.Drawing.Point(1057, 168);
+            this.LogOfMoves.Name = "LogOfMoves";
+            this.LogOfMoves.Size = new System.Drawing.Size(211, 360);
+            this.LogOfMoves.TabIndex = 5;
+            this.LogOfMoves.Text = "Hello world. U";
+            // 
             // BattleField
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.ClientSize = new System.Drawing.Size(1280, 720);
+            this.Controls.Add(this.LogOfMoves);
             this.Controls.Add(this.ActionPanel);
             this.Controls.Add(this.deploymentPanel);
             this.Name = "BattleField";
@@ -219,6 +234,7 @@
             this.Load += new System.EventHandler(this.BattleField_Load);
             this.Controls.SetChildIndex(this.deploymentPanel, 0);
             this.Controls.SetChildIndex(this.ActionPanel, 0);
+            this.Controls.SetChildIndex(this.LogOfMoves, 0);
             this.deploymentPanel.ResumeLayout(false);
             this.deploymentPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DeploySniper)).EndInit();
@@ -248,5 +264,6 @@
         private System.Windows.Forms.PictureBox ActionShot;
         private System.Windows.Forms.PictureBox Skip;
         private System.Windows.Forms.PictureBox ActionMove;
+        private System.Windows.Forms.RichTextBox LogOfMoves;
     }
 }
