@@ -13,7 +13,8 @@ namespace IslandDeployed
 {
     public partial class Shop : BaseForm
     {
-        int gold = 1000;
+        int gold = Forms.Welcome.goldForUnits;
+        
         public static int numberOfSnipers;
         public static int numberOfMercenaries;
         public static int numberOfInfantry;
@@ -50,6 +51,7 @@ namespace IslandDeployed
             if (CanAfford(200))
             {
                 numberOfInfantry++;
+                InfantryLabel.Text = "You bought: " + numberOfInfantry.ToString();
             }
             
             
@@ -60,6 +62,7 @@ namespace IslandDeployed
             if (CanAfford(150))
             {
                 numberOfMercenaries++;
+                MercenarieLabel.Text = "You bought: " + numberOfMercenaries.ToString();
             }
             
         }
@@ -69,6 +72,7 @@ namespace IslandDeployed
             if (CanAfford(400))
             {
                 numberOfSnipers++;
+                SniperLabel.Text = "You bought: " + numberOfSnipers.ToString();
             }
         }
 
@@ -76,9 +80,17 @@ namespace IslandDeployed
 
         private void Start_Click_1(object sender, EventArgs e)
         {
-            Close();
-            BattleField game = new BattleField();
-            game.Show();
+            if (gold > 500)
+            {
+                MessageBox.Show("You haven't even spent half of your money. BUY MORE.");
+            }
+            else
+            {
+                Close();
+                BattleField game = new BattleField();
+                game.Show();
+            }
+
 
         }
 

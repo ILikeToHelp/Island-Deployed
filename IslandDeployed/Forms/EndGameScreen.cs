@@ -27,7 +27,7 @@ namespace IslandDeployed.Forms
             }
             else
             {
-                BackgroundImage = Properties.Resources.dead;
+                WinOrLose.BackgroundImage = Properties.Resources.dead;
                 text.Text = "YOU LOSE";
 
             }
@@ -41,7 +41,7 @@ namespace IslandDeployed.Forms
         private void BackToMainMenu_Click(object sender, EventArgs e)
         {
             this.Close();
-            MainMenu back = new MainMenu();
+            Welcome back = new Welcome();
             back.Show();
         }
     }

@@ -13,15 +13,16 @@ namespace IslandDeployed
     public partial class BattleField : BaseForm
     {
         //-----------------START OF VARIABLE DECLARATION-----------------------------\\
+
         static readonly int width = 15;
         static readonly int height = 9;
 
         public static bool win = false;
 
-        int computerGold = 200;
+        int computerGold = 1000;
 
-        List<CoOrds> player1Soldiers = new List<CoOrds>();//players 2 soldiers coordinatees
-        List<CoOrds> computerSoldiers = new List<CoOrds>();//players 1 soldiers coordinatees
+        List<Coordinates> player1Soldiers = new List<Coordinates>();                     // lists needed for computer turns (decision on whom to shoot)
+        List<Coordinates> computerSoldiers = new List<Coordinates>();                              
 
         int numberOfMercenaries = Shop.numberOfMercenaries;
         int numberOfInfantry = Shop.numberOfInfantry;
@@ -30,24 +31,24 @@ namespace IslandDeployed
         bool canContinue = true;
 
 
-        Classes.Soldier temporary = new Classes.Soldier();
+        Classes.Soldier temporary = new Classes.Soldier();                              // temporary object to reduce memory access (alternative includes nested for loop)
 
-        bool[,] allowedMoves = new bool[width, height];
+        bool[,] allowedMoves = new bool[width, height];                                 // mimics set up of the battlefield and tracks accessible tiles during "movement"
 
-        Label[,] labelArray = new Label[width, height];
+        Label[,] labelArray = new Label[width, height];                                 // used for displaying "health bars"
 
-        PictureBox[,] pictureArray = new PictureBox[width, height];
+        PictureBox[,] pictureArray = new PictureBox[width, height];                     // visual representation of the battle field
 
-        Classes.Soldier[,] arrayOfSoldiers =                                             // Object array, of size of the battlefield 
-                           new Classes.Soldier[width, height];                           // to allow object manipulation
+        Classes.Soldier[,] arrayOfSoldiers =                                            // allows object manipulation, in a convenient way
+                           new Classes.Soldier[width, height];                           
 
 
-        string finiteStateMachine = "initialization";
+        string finiteStateMachine = "initialization";                                    
         string whoIsBeingDeployed = "none";
-        public struct CoOrds
+        public struct Coordinates
         {
             public int x, y;
-            public CoOrds(int p1, int p2)
+            public Coordinates(int p1, int p2)
             {
                 x = p1;
                 y = p2;
@@ -55,12 +56,10 @@ namespace IslandDeployed
 
         }
 
-
-
         //-----------------END OF VARIABLE DECLARATION-----------------------------\\
 
 
-        public BattleField()                                                             // initializes
+        public BattleField()
         {
             InitializeComponent();
         }
@@ -95,8 +94,9 @@ namespace IslandDeployed
                 }
             }
         }
-        private void BattleField_Load(object sender, EventArgs e)                        // loads
+        private void BattleField_Load(object sender, EventArgs e)
         {
+            MessageBox.Show("Deploy your units by clicking at the picture and then at a desired spot");
             ResetAllValues();
             CreateField();
             ComputerDeployment();
@@ -106,9 +106,7 @@ namespace IslandDeployed
             deploymentPanel.BringToFront();
 
         }
-        private void CreateField()                                                       // sets up the "battle field" (width x height picture boxes)  
-
-
+        private void CreateField()                                                        // sets up the "battle field" (width x height picture boxes)
         {
             //starting coordinates
             int x = 0;
@@ -148,7 +146,75 @@ namespace IslandDeployed
                 }
             }
         }
-        private void ComputerDeployment()
+        private void Skip_Click(object sender, EventArgs e)
+        {
+            // short method for skipping turn
+            CleanBoard();
+            ActionPanel.Visible = false;
+            finiteStateMachine = "computersTurn";
+            HierarchyOfComputerMoves();
+        }
+
+        private void pictureBox_Click(object sender, EventArgs e)
+        {
+            LogOfMoves.SelectionStart = LogOfMoves.Text.Length;
+            LogOfMoves.ScrollToCaret();
+
+            PictureBox picture = (PictureBox)sender;
+
+            Coordinates coordinates = new Coordinates();
+            coordinates = FindPicture(picture);
+
+            int x = coordinates.x; int y = coordinates.y;                                 // saving coordinates of the picture to two integers for ease of use
+
+            if (finiteStateMachine == "placement")
+            {
+                if (y < 3)
+                {
+                    PlaceUnit(picture, FindPicture(picture));
+                }
+                else
+                {
+                    MessageBox.Show("You can only place units within bottom 3 rows");
+                }
+                
+            }
+
+            else if (finiteStateMachine == "playersTurn" && arrayOfSoldiers[x, y] != null) // can perform an action if and only if this place is occupied by players unit
+            {
+
+                if (arrayOfSoldiers[x, y].Player1Owned)
+                {
+                    ActionPanel.Visible = true;
+                    ActionPanel.BackgroundImage = Properties.Resources.panel;
+                    temporary = arrayOfSoldiers[x, y];
+
+                }
+
+            }
+            else if (finiteStateMachine == "moving")
+            {
+                LogOfMoves.Text += "You are now moving. Boring.\n";
+                if (arrayOfSoldiers[x, y] == null)
+                {
+                    ChangePosition(x, y);
+                }
+                else if (!arrayOfSoldiers[x, y].Player1Owned)
+                {
+                    Melee(x, y);
+                }
+            }
+            else if (finiteStateMachine == "shooting")
+            {
+                LogOfMoves.Text += "You are now shooting. That's exciting!\n";
+                Shooting(x, y);
+            }
+
+        }                    // game flow determined by states of FSM
+
+
+        //----------------------Deployment methods below-----------------------------\\
+        private void ComputerDeployment()                                                // randomly allocates computer's units
         {
             // method which deploys computers unit
 
@@ -166,178 +232,40 @@ namespace IslandDeployed
                 {
                     arrayOfSoldiers[v, g] = new Classes.Soldier(v, g, 2, 50, 100, 80, "Sniper", 50, 50, false);
                     pictureArray[v, g].Image = Properties.Resources.S2;
+                    deployed = true;
                     computerGold -= 400;
-
-                    CoOrds coordinates = new CoOrds();
-                    coordinates.x = v; coordinates.y = g;
-                    computerSoldiers.Add(coordinates);
-                    SetHealthBar(v, g);
                 }
 
 
-
-                else if (arrayOfSoldiers[v, g] == null && computerGold >= 200 && g != height - 3)
+                else if (arrayOfSoldiers[v, g] == null && computerGold >= 200 && g == height)
                 {
                     arrayOfSoldiers[v, g] = new Classes.Soldier(v, g, 3, 50, 33, 70, "Infantry", 200, 200, false);
                     pictureArray[v, g].Image = Properties.Resources.I2;
+                    deployed = true;
                     computerGold -= 200;
-
-                    CoOrds coordinates = new CoOrds();
-                    coordinates.x = v; coordinates.y = g;
-                    computerSoldiers.Add(coordinates);
-                    SetHealthBar(v, g);
                 }
 
-                else if (arrayOfSoldiers[v, g] == null && computerGold >= 150 )
+                else if (arrayOfSoldiers[v, g] == null && computerGold >= 150)
                 {
                     arrayOfSoldiers[v, g] = new Classes.Soldier(v, g, 4, 60, 20, 60, "Mercenarie", 100, 100, false);
                     pictureArray[v, g].Image = Properties.Resources.M2;
                     deployed = true;
                     computerGold -= 150;
 
-                    CoOrds coordinates = new CoOrds();
+                }
+                if (deployed)
+                {
+                    Coordinates coordinates = new Coordinates();
                     coordinates.x = v; coordinates.y = g;
                     computerSoldiers.Add(coordinates);
                     SetHealthBar(v, g);
-
                 }
-
-            }
-
-        }                                            // randomly allocates computer's units
-
-        private bool IsPlayerNear(int x, int y)
-        {
-            bool isIt = false;
-
-            MovesAllowed();
-
-            return isIt;
-        }
-        private void ChargeAtUser()
-        { }
-        private void HierarchyOfComputerMoves()
-        {
-            bool computerMoved = false;
-
-            while (!computerMoved)
-            {
-                for (int i = 0; i < computerSoldiers.Count; i++)
-                {
-
-                    int x = computerSoldiers.ElementAt(i).x;
-                    int y = computerSoldiers.ElementAt(i).y;
-                    string who = arrayOfSoldiers[x, y].Type;
-                    if (who == "Sniper")
-                    {
-                        LogOfMoves.Text += "\nSniper";
-                        ComputerShoots(x, y);
-                        computerMoved = true;
-                        break;
-                    }
-                    else if (who == "Mercenarie")
-                    {
-                        temporary = arrayOfSoldiers[x, y];
-                        LogOfMoves.Text += "\nMercenarie";
-                        if (IsPlayerNear(x, y))
-                        {
-                            ChargeAtUser();
-                            computerMoved = true;
-                            break;
-                        }
-                    }
-                    else if (who == "Infantry")
-                    {
-                        LogOfMoves.Text += "\nInfantry";
-                        ComputerShoots(x, y);
-                        computerMoved = true;
-                        break;
-                    }
-                }
-                break;
-            }
-            // finnaly check if user has any units left
-            if (player1Soldiers.Count == 0)
-            {
-
-                MessageBox.Show("YOU LOSE");
-                this.Close();
-                Forms.EndGameScreen c = new Forms.EndGameScreen();
-                c.Show();
-            }
-            else
-            {
-                LogOfMoves.Text += "\nYour turn";
-                finiteStateMachine = "playersTurn";
-            }
-
-        }
-        private bool IsUnitDead(int x, int y)
-        {
-            // if unit got killed, remove it from the list of objects and decreas count of user's units.
-            if (arrayOfSoldiers[x, y].Health == 0)
-            {
-
-                arrayOfSoldiers[x, y] = null;
-
-                if (finiteStateMachine == "computersTurn")
-                {
-                    for (int m = 0; m < player1Soldiers.Count; m++)
-                    {
-                        if (player1Soldiers.ElementAt(m).x == x && player1Soldiers.ElementAt(m).y == y)
-                        {
-                            player1Soldiers.RemoveAt(m);
-                            Classes.Soldier.countPlayer1 -= 1;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    for (int m = 0; m < computerSoldiers.Count; m++)
-                    {
-                        if (computerSoldiers.ElementAt(m).x == x && computerSoldiers.ElementAt(m).y == y)
-                        {
-                            computerSoldiers.RemoveAt(m);
-                            Classes.Soldier.countPlayer2 -= 1;
-                            break;
-                        }
-                    }
-                }
-
-                return true;
-            }
-
-            return false;
-        }
-        private void ComputerShoots(int xCP, int yCP)
-        {
-            // when computer shoots it randomly chooses target.
-
-            Random random = new Random();
-            int w = random.Next(player1Soldiers.Count);
-
-            //users coordinates
-            int y = player1Soldiers.ElementAt(w).y;
-            int x = player1Soldiers.ElementAt(w).x;
-
-            if (arrayOfSoldiers[xCP, yCP].dealDamage())                                      // Has computer missed or scored a hit ?
-            {
-
-                arrayOfSoldiers[x, y].TakeDamage(arrayOfSoldiers[xCP, yCP].RangeDamage);     // If so, damage user's unit.
-                LogOfMoves.Text += "\nDelt: " + arrayOfSoldiers[xCP, yCP].RangeDamage.ToString();
-                if (IsUnitDead(x, y))
-                {
-                    pictureArray[x, y].BackgroundImage = Properties.Resources.dead;
-                }
-                
-                CleanBoard();
 
             }
 
         }
 
-        private void DeployMercenarie_Click(object sender, EventArgs e)
+        private void DeployMercenarie_Click(object sender, EventArgs e)                  // three methods for deploying the correct unit
         {
             if (numberOfMercenaries > 0)
             {
@@ -347,7 +275,7 @@ namespace IslandDeployed
                 numberOfMercenaries -= 1;
                 UpdateLabels();
             }
-        }              // <-
+        }
         private void DeployInfantry_Click(object sender, EventArgs e)
         {
             if (numberOfInfantry > 0)
@@ -358,7 +286,7 @@ namespace IslandDeployed
                 numberOfInfantry -= 1;
                 UpdateLabels();
             }
-        }                // three methods for deploying the correct unit
+        }                // cd
         private void DeploySniper_Click(object sender, EventArgs e)
         {
             if (numberOfSnipers > 0)
@@ -369,23 +297,14 @@ namespace IslandDeployed
                 numberOfSnipers -= 1;
                 UpdateLabels();
             }
-        }                  // <-
+        }                  // cd
 
-        private void UpdateLabels()
+        private void PlaceUnit(PictureBox p, Coordinates a)                              // method responsible for placing units onto the field
         {
-            // short method to update labels on the deployment panel
-
-            infantryLeft.Text = numberOfInfantry.ToString();
-            mercenariesLeft.Text = numberOfMercenaries.ToString();
-            snipersLeft.Text = numberOfSnipers.ToString();
-        }
-
-        private void PlaceUnit(PictureBox p, CoOrds a)                                  // method responsible for placing unit onto the field
-        {                                                                               // and assigning correct values to the object array
             if (whoIsBeingDeployed == "mercenarie")
             {
                 p.Image = Properties.Resources.M;
-                arrayOfSoldiers[a.x, a.y] = new Classes.Soldier(a.x, a.y, 4, 60, 20, 50, "Mercenarie", 100, 100, true);
+                arrayOfSoldiers[a.x, a.y] = new Classes.Soldier(a.x, a.y, 4, 80, 20, 50, "Mercenarie", 100, 100, true);
             }
             else if (whoIsBeingDeployed == "infantry")
             {
@@ -401,6 +320,8 @@ namespace IslandDeployed
             if (numberOfInfantry == 0 && numberOfMercenaries == 0 && numberOfSnipers == 0)
             {
                 finiteStateMachine = "playersTurn";
+
+                MessageBox.Show("Click your unit to open action panel. \nChoose to either shoot, move(and stab) or to skip turn. \nGood luck!");
                 CleanBoard();
             }
             else
@@ -409,65 +330,153 @@ namespace IslandDeployed
                 deploymentPanel.Visible = true;
             }
 
-            CoOrds coordinates = new CoOrds();
+            Coordinates coordinates = new Coordinates();
             coordinates = a;
             player1Soldiers.Add(coordinates);
+
+
         }
 
-        private void pictureBox_Click(object sender, EventArgs e)
+        //-----------------------Deployment methods above---------------------------\\
+
+
+
+        //--------------------------MY AI BELOW--------------------------------------\\
+        private void HierarchyOfComputerMoves()                                         // prioritizes Snipers - they deal most damage and have highest accuracy. 
+
         {
-            LogOfMoves.Text += "\n mine: " + Classes.Soldier.countPlayer1.ToString() + " and: " + Classes.Soldier.countPlayer2.ToString();
-            LogOfMoves.Text += "\n FSM: " + finiteStateMachine;
-            PictureBox picture = (PictureBox)sender;
+            bool computerMoved = false;
 
-            int x = FindPicture(picture).x;
-            int y = FindPicture(picture).y;
-
-            if (finiteStateMachine == "placement")
+            while (!computerMoved)
             {
-                PlaceUnit(picture, FindPicture(picture));
-            }
-
-            else if (finiteStateMachine == "playersTurn" && arrayOfSoldiers[x, y] != null) // can perform an action if and only if this place is occupied by players unit
-            {
-
-                if (arrayOfSoldiers[x, y].Player1Owned)
+                for (int i = 0; i < computerSoldiers.Count; i++)
                 {
-                    ActionPanel.Visible = true;
-                    ActionPanel.BackgroundImage = Properties.Resources.panel;
-                    temporary = arrayOfSoldiers[x, y];
 
+                    int x = computerSoldiers.ElementAt(i).x;
+                    int y = computerSoldiers.ElementAt(i).y;
+                    string who = arrayOfSoldiers[x, y].Type;
+                    if (who == "Sniper")
+                    {
+                        LogOfMoves.Text += "\nEnemy Sniper shoots...";
+                        ComputerShoots(x, y);
+                        computerMoved = true;
+                        break;
+                    }
+                    else if (who == "Mercenarie")
+                    {
+                        temporary = arrayOfSoldiers[x, y];
+                        LogOfMoves.Text += "\nEnemy Mercenarie is checking if he can reach you...";
+                        finiteStateMachine = "computerMelee";
+                        MovesAllowed();
+                        CleanBoard();
+                        computerMoved = true;
+                        break;
+
+                    }
+                    else if (who == "Infantry")
+                    {
+                        LogOfMoves.Text += "\nEnemy Infantry shoots...";
+                        ComputerShoots(x, y);
+                        computerMoved = true;
+                        break;
+                    }
+                }
+                break;
+            }
+            // finnaly check if user has any units left#
+            DidILose();
+
+
+        }                                      // prioritizes Snipers - they deal most damage and have highest accuracy. 
+
+        private void ComputerShoots(int xCP, int yCP)
+        {
+            // when computer shoots it randomly chooses target, from the list of players alive units
+
+            Random random = new Random();
+            int w = random.Next(player1Soldiers.Count);
+
+            //users coordinates
+            int y = player1Soldiers.ElementAt(w).y;
+            int x = player1Soldiers.ElementAt(w).x;
+
+            if (arrayOfSoldiers[xCP, yCP].dealDamage())                                      // Has computer missed or scored a hit ?
+            {
+
+                arrayOfSoldiers[x, y].TakeDamage(arrayOfSoldiers[xCP, yCP].RangeDamage);     // If so, damage user's unit.
+                LogOfMoves.Text += " and hits! You received: " + arrayOfSoldiers[xCP, yCP].RangeDamage.ToString() + " damage.\n";
+                if (IsUnitDead(x, y))
+                {
+                    pictureArray[x, y].BackgroundImage = Properties.Resources.dead;
                 }
 
-            }
-            else if (finiteStateMachine == "moving")
-            {
+                CleanBoard();
 
-                if (arrayOfSoldiers[x, y] == null)
-                {
-                    ChangePosition(x, y);
-                }
-                else if (!arrayOfSoldiers[x, y].Player1Owned)
-                {
-                    Melee(x, y);
-                }
             }
-            else if (finiteStateMachine == "shooting")
+            else
             {
-                Shooting(x, y);
+                LogOfMoves.Text += " and misses. Uff, that was close. \n";
             }
+
+        }
+
+        private void ChargeAtUser(int x, int y)
+        {
+            arrayOfSoldiers[x, y].Health -= temporary.MeleeDamage;
+            LogOfMoves.Text += "and he does! Your unit lost " + temporary.MeleeDamage.ToString() + " hp.";
+            IsUnitDead(x,y);
             
-        }                    // game flow determined by states of FSM
-
-        private void Skip_Click(object sender, EventArgs e)
-        {
-            CleanBoard();
-            ActionPanel.Visible = false;
-            finiteStateMachine = "computersTurn";
-            HierarchyOfComputerMoves();
         }
+        private bool IsUnitDead(int x, int y)
+        {
+            // if unit got killed, remove it from the list of objects and decreas count of user's units.
 
-        //--------------------Move methods below-------------------\\
+            if (arrayOfSoldiers[x, y].Health == 0)
+            {
+
+                arrayOfSoldiers[x, y] = null;
+                pictureArray[x, y].BackgroundImage = Properties.Resources.dead;
+                LogOfMoves.Text += " In the result, unit has perished. At least they have a grave stone.\n";
+
+                if (finiteStateMachine == "computersTurn" || finiteStateMachine == "computerMelee")
+                {
+                    for (int m = 0; m < player1Soldiers.Count; m++)
+                    {
+                        if (player1Soldiers.ElementAt(m).x == x && player1Soldiers.ElementAt(m).y == y)
+                        {
+                            canContinue = false;
+                            player1Soldiers.RemoveAt(m);
+                            Classes.Soldier.countPlayer1 -= 1;
+                            LogOfMoves.Text += "\n You have only  :" + Classes.Soldier.countPlayer1.ToString() + " unit/s alive!";
+                            finiteStateMachine = "usersTurn";
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    for (int m = 0; m < computerSoldiers.Count; m++)
+                    {
+                        if (computerSoldiers.ElementAt(m).x == x && computerSoldiers.ElementAt(m).y == y)
+                        {
+                            computerSoldiers.RemoveAt(m);
+                            Classes.Soldier.countPlayer2 -= 1;
+                            LogOfMoves.Text += "\nYou only have to kill: " + Classes.Soldier.countPlayer2.ToString()+"  more unit/s to win!";
+                            break;
+                        }
+                    }
+                }
+
+                return true;
+            }
+            return false;
+        }
+        //------------------------MY AI ABOVE---------------------------------\\
+
+       
+        
+
+        //---------------------------Move methods below--------------------------\\
         private void ActionMove_Click(object sender, EventArgs e)
         {
             finiteStateMachine = "moving";
@@ -482,60 +491,59 @@ namespace IslandDeployed
             canContinue = true;
             int speed = temporary.Speed;
 
-            for (int i = 1; i <= speed; i++)
+            int i = 0;
+
+            do
             {
-                if (canContinue)
+                i++;
+                // validation to prevent "out of boundrier" error
+                if (temporary.getXCoords() + i < width && canContinue)
                 {
 
-                    if (temporary.getXCoords() + i < width)
+                    MovementVisuals(i, 0);                                   // right
+
+                    if (temporary.getYCoords() + i < height && canContinue)
                     {
-
-                        MovementVisuals(i, 0);                                // right
-
-                        if (temporary.getYCoords() + i < height)
-                        {
-                            MovementVisuals(i, i);                            // diagno right up
-                        }
-
-                        if (temporary.getYCoords() - i >= 0)
-                        {
-                            MovementVisuals(i, -i);                           // diagno right down
-                        }
+                        MovementVisuals(i, i);                              // diagno right up
                     }
 
-
-                    if (temporary.getXCoords() - i >= 0)
+                    if (temporary.getYCoords() - i >= 0 && canContinue)
                     {
+                        MovementVisuals(i, -i);                              // diagno right down
+                    }
+                }
 
-                        MovementVisuals(-i, 0);                               // left
 
-                        if (temporary.getYCoords() - i >= 0)        // left diagno down
-                        {
-                            MovementVisuals(-i, -i);
-                        }
+                if (temporary.getXCoords() - i >= 0& canContinue)
+                {
 
-                        if (temporary.getYCoords() + i < height)    // left diagno up
-                        {
-                            MovementVisuals(-i, i);
-                        }
+                    MovementVisuals(-i, 0);                                 // left
 
+                    if (temporary.getYCoords() - i >= 0 && canContinue)                    // left diagno down
+                    {
+                        MovementVisuals(-i, -i);
                     }
 
-                    if (temporary.getYCoords() + i < height)
+                    if (temporary.getYCoords() + i < height && canContinue)                // left diagno up
                     {
-                        MovementVisuals(0, i);                                // up
-                    }
-
-                    if (temporary.getYCoords() - i >= 0)
-                    {
-                        MovementVisuals(0, -i);                               // down
+                        MovementVisuals(-i, i);
                     }
 
                 }
 
-            }
+                if (temporary.getYCoords() + i < height&& canContinue)
+                {
+                    MovementVisuals(0, i);                                 // up
+                }
 
+                if (temporary.getYCoords() - i >= 0 && canContinue)
+                {
+                    MovementVisuals(0, -i);                               // down
+                }
+
+            } while (canContinue && i != speed);
         }
+
         private void MovementVisuals(int xOffset, int yOffset)
         {
             // visual effect and assigment of moves to allowedMoves array.
@@ -550,85 +558,123 @@ namespace IslandDeployed
                 pictureArray[x, y].Image = Properties.Resources.canGo;
 
             }
+
             else if (!arrayOfSoldiers[x, y].Player1Owned)
             {
-                if (arrayOfSoldiers[x, y].Type == "Sniper")
+                if (finiteStateMachine == "computerMelee")
+                {
+                    canContinue = true;
+                }
+                else if (arrayOfSoldiers[x, y].Type == "Sniper")
                 {
                     pictureArray[x, y].Image = Properties.Resources.S2Red;
+                    canContinue = false;
                 }
                 else if (arrayOfSoldiers[x, y].Type == "Mercenarie")
                 {
                     pictureArray[x, y].Image = Properties.Resources.M2Red;
+                    canContinue = false;
                 }
                 else
                 {
                     pictureArray[x, y].Image = Properties.Resources.I2Red;
+                    canContinue = false;
                 }
 
-                canContinue = false;                // if soldier encounters an enemy then he must not be able to continue past them
+                               // if soldier encounters an enemy then he must not be able to continue past them
+            }
+            else if (finiteStateMachine == "computerMelee")
+            {
+                if (arrayOfSoldiers[x,y+1] == null)
+                {
+                    ChangePosition(x, y + 1);
+                    canContinue = false;
+                }
+
+                ChargeAtUser(x, y);
+                finiteStateMachine = "usersTurn";
             }
 
         }
         private void ChangePosition(int x, int y)
         {
-            // swaps location of object which moves
+            // swaps location of object which moves; i, j is the old position, x and y is the target position.
 
             int i = temporary.getXCoords();
             int j = temporary.getYCoords();
 
-            for (int m = 0; m < player1Soldiers.Count; m++)
-            {
-                if (player1Soldiers.ElementAt(m).x == i && player1Soldiers.ElementAt(m).y == j)
-                {
-                    player1Soldiers.RemoveAt(m);
-                    break;
-                }
-            }
-            arrayOfSoldiers[i,j] = null;    // old location <= null
-
-            CoOrds coOrds = new CoOrds();
+            Coordinates coOrds = new Coordinates();
             coOrds.x = x;
             coOrds.y = y;
-            player1Soldiers.Add(coOrds);
 
-            temporary.setXCoords(x); temporary.setYCoords(y);                          // object location <= new co-ords
-            arrayOfSoldiers[x, y] = temporary;                                         // update array
-            CleanBoard();
-            finiteStateMachine = "computersTurn";
-            HierarchyOfComputerMoves();
-
-        }
-        private void Melee(int x, int y)
-        {
-            // moving on to a tile taken by computers unit causes a fight
-            arrayOfSoldiers[x, y].Health -= temporary.MeleeDamage;
-
-            if (IsUnitDead(x, y))
+            if (finiteStateMachine == "computerMelee")
             {
                 for (int m = 0; m < computerSoldiers.Count; m++)
                 {
-                    if (player1Soldiers.ElementAt(m).x == x && player1Soldiers.ElementAt(m).y == y)
+                    if (computerSoldiers.ElementAt(m).x == i && computerSoldiers.ElementAt(m).y == j)
                     {
                         computerSoldiers.RemoveAt(m);
                         break;
                     }
                 }
-
-                ChangePosition(x, y);
-                Classes.Soldier.countPlayer2--;
-                DidIWin();
-
+                computerSoldiers.Add(coOrds);
             }
+
+            else
+            {
+                for (int m = 0; m < player1Soldiers.Count; m++)
+                {
+                    if (player1Soldiers.ElementAt(m).x == i && player1Soldiers.ElementAt(m).y == j)
+                    {
+                        player1Soldiers.RemoveAt(m);
+                        break;
+                    }
+                }
+                player1Soldiers.Add(coOrds);
+                finiteStateMachine = "computersTurn";
+            }
+
+            arrayOfSoldiers[i,j] = null;    
+            temporary.setXCoords(x); temporary.setYCoords(y);                          // object location <= new co-ords
+            arrayOfSoldiers[x, y] = temporary;                                         // update array
             CleanBoard();
 
-            finiteStateMachine = "computersTurn";
+            if (finiteStateMachine == "computersTurn")
+            {
+                HierarchyOfComputerMoves();
+            }
+            else if (finiteStateMachine == "computerMelee")
+            {
+                finiteStateMachine = "usersTurn";
+            }
+            
+
+        }
+        private void Melee(int x, int y)
+        {
+            // moving on to a tile taken by computers unit causes a fight
+
+            arrayOfSoldiers[x, y].Health -= temporary.MeleeDamage;
+            LogOfMoves.Text += "You sticked them with the pointy end for: " + temporary.MeleeDamage.ToString();
+            if (IsUnitDead(x, y))
+            {
+                LogOfMoves.Text += "\nand therfore they can't live anymore.\n";
+            }
+
+            ChangePosition(x, y);
+            DidIWin();
+            CleanBoard();
+            finiteStateMachine = "computersTurn";                               //computers turn
             HierarchyOfComputerMoves();
 
         }
 
-        //------------------End of user movement methods--------------------\\
+        //-----------------------End of user movement methods-----------------------\\
 
-        //-----------------User fire power methods below--------------------\\
+
+
+
+        //------------------------User fire power methods below-------------------------\\
         private void ActionShot_Click(object sender, EventArgs e)
         {
             finiteStateMachine = "shooting";
@@ -639,33 +685,31 @@ namespace IslandDeployed
             if (arrayOfSoldiers[x, y] != null && !arrayOfSoldiers[x, y].Player1Owned)
             {
                 arrayOfSoldiers[x, y].Health -= temporary.RangeDamage;
+                LogOfMoves.Text += "\nThe bullet takes off " + temporary.RangeDamage.ToString()+ " of his hp!";
                 if (IsUnitDead(x, y))
                 {
-                    Classes.Soldier.countPlayer1--;
                     labelArray[x, y].Visible = false;
                     pictureArray[x, y].BackgroundImage = Properties.Resources.dead;
+                    DidIWin();
                     
                 }
-                if (DidIWin())
-                {
 
-                }
-                else
-                {
                     CleanBoard();
                     finiteStateMachine = "computersTurn";
                     HierarchyOfComputerMoves();
-                }
+                
 
             }
         }
 
-        //--------------------End of fire power methods--------------------\\
-        private CoOrds FindPicture(PictureBox p)
+        //----------------------------End of fire power methods-------------------------\\
+
+
+        private Coordinates FindPicture(PictureBox p)
         {
             // nested 'for' loop to find which button was clicked
 
-            CoOrds a = new CoOrds();
+            Coordinates a = new Coordinates();
 
             for (int i = 0; i < width; i++)
             {
@@ -683,6 +727,45 @@ namespace IslandDeployed
             return a;
         }                                     // returns cooridantes of the picturebox clicked
 
+        private bool DidIWin()
+        {
+            if (Classes.Soldier.countPlayer2 == 0)
+            {
+                
+                MessageBox.Show("YOU WIN");
+                win = true;
+                this.Close();
+                Forms.EndGameScreen c = new Forms.EndGameScreen();
+                c.Show();
+                return true;
+            }
+            return false;
+        }
+        private void DidILose()
+        {
+            if (player1Soldiers.Count == 0)
+            {
+
+                MessageBox.Show("YOU LOSE");
+                this.Close();
+                Forms.EndGameScreen c = new Forms.EndGameScreen();
+                c.Show();
+            }
+            else
+            {
+                LogOfMoves.Text += "\nYour turn\n";
+                finiteStateMachine = "playersTurn";
+            }
+        }
+        //---------------------------Visual methods below-------------------------------\\
+        private void UpdateLabels()
+        {
+            // short method to update labels on the deployment panel
+
+            infantryLeft.Text = numberOfInfantry.ToString();
+            mercenariesLeft.Text = numberOfMercenaries.ToString();
+            snipersLeft.Text = numberOfSnipers.ToString();
+        }
         private void CleanBoard()
         {
             // nested 'for' loop which reads value and restores the original images
@@ -758,19 +841,8 @@ namespace IslandDeployed
             }
 
         }
-        private bool DidIWin()
-        {
-            if (Classes.Soldier.countPlayer2 == 0)
-            {
-                
-                MessageBox.Show("YOU WIN");
-                win = true;
-                this.Close();
-                Forms.EndGameScreen c = new Forms.EndGameScreen();
-                c.Show();
-                return true;
-            }
-            return false;
-        }
+
+        //------------------Visual methods above--------------------\\
+
     }
 }

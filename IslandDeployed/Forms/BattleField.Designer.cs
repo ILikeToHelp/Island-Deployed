@@ -212,20 +212,20 @@
             // LogOfMoves
             // 
             this.LogOfMoves.BackColor = System.Drawing.SystemColors.InfoText;
-            this.LogOfMoves.Font = new System.Drawing.Font("Neogrey Medium", 9.7F, System.Drawing.FontStyle.Bold);
-            this.LogOfMoves.ForeColor = System.Drawing.Color.Green;
-            this.LogOfMoves.Location = new System.Drawing.Point(1057, 168);
+            this.LogOfMoves.Font = new System.Drawing.Font("Georgia", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.LogOfMoves.ForeColor = System.Drawing.Color.LimeGreen;
+            this.LogOfMoves.Location = new System.Drawing.Point(1078, 118);
             this.LogOfMoves.Name = "LogOfMoves";
-            this.LogOfMoves.Size = new System.Drawing.Size(211, 360);
+            this.LogOfMoves.Size = new System.Drawing.Size(299, 432);
             this.LogOfMoves.TabIndex = 5;
-            this.LogOfMoves.Text = "Hello world. U";
+            this.LogOfMoves.Text = "";
             // 
             // BattleField
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
-            this.ClientSize = new System.Drawing.Size(1280, 720);
+            this.ClientSize = new System.Drawing.Size(1389, 720);
             this.Controls.Add(this.LogOfMoves);
             this.Controls.Add(this.ActionPanel);
             this.Controls.Add(this.deploymentPanel);

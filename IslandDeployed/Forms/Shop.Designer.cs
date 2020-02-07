@@ -48,6 +48,11 @@
             this.buyMercenarie = new System.Windows.Forms.PictureBox();
             this.buyInfantry = new System.Windows.Forms.PictureBox();
             this.Start = new System.Windows.Forms.PictureBox();
+            this.InfantryLabel = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
+            this.SniperLabel = new System.Windows.Forms.Label();
+            this.MercenarieLabel = new System.Windows.Forms.Label();
+            this.label11 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox0)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
@@ -132,9 +137,9 @@
             this.label2.ForeColor = System.Drawing.Color.Orange;
             this.label2.Location = new System.Drawing.Point(750, 351);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(197, 180);
+            this.label2.Size = new System.Drawing.Size(197, 210);
             this.label2.TabIndex = 9;
-            this.label2.Text = "COST 400 GP\r\n\r\nHP = 50\r\nRD = 100\r\nMD = 50\r\nAC = 0\r\n";
+            this.label2.Text = "COST 400 GP\r\n\r\nHP = 50\r\nRD = 100\r\nMD = 50\r\nSPD = 2\r\n\r\n";
             // 
             // label3
             // 
@@ -144,9 +149,9 @@
             this.label3.ForeColor = System.Drawing.Color.Orange;
             this.label3.Location = new System.Drawing.Point(450, 351);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(188, 180);
+            this.label3.Size = new System.Drawing.Size(188, 210);
             this.label3.TabIndex = 10;
-            this.label3.Text = "COST 150 GP\r\n\r\nHP = 100\r\nRD = 20\r\nMD = 60\r\nAC = 5\r\n";
+            this.label3.Text = "COST 150 GP\r\n\r\nHP = 100\r\nRD = 20\r\nMD = 60\r\nSPD =4\r\n\r\n";
             // 
             // label4
             // 
@@ -158,7 +163,7 @@
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(197, 180);
             this.label4.TabIndex = 11;
-            this.label4.Text = "COST 200 GP\r\n\r\nHP = 200\r\nRD = 33\r\nMD = 50\r\nAC = 25";
+            this.label4.Text = "COST 200 GP\r\n\r\nHP = 200\r\nRD = 33\r\nMD = 50\r\nSPD = 3";
             // 
             // label5
             // 
@@ -166,11 +171,11 @@
             this.label5.BackColor = System.Drawing.Color.Transparent;
             this.label5.Font = new System.Drawing.Font("Andre V", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label5.ForeColor = System.Drawing.Color.Orange;
-            this.label5.Location = new System.Drawing.Point(102, 621);
+            this.label5.Location = new System.Drawing.Point(407, 681);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(78, 30);
+            this.label5.Size = new System.Drawing.Size(323, 30);
             this.label5.TabIndex = 15;
-            this.label5.Text = "Buy !";
+            this.label5.Text = "Click the coin to purchase";
             // 
             // label6
             // 
@@ -279,12 +284,77 @@
             this.Start.TabStop = false;
             this.Start.Click += new System.EventHandler(this.Start_Click_1);
             // 
+            // InfantryLabel
+            // 
+            this.InfantryLabel.AutoSize = true;
+            this.InfantryLabel.BackColor = System.Drawing.Color.Transparent;
+            this.InfantryLabel.Font = new System.Drawing.Font("Andre V", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.InfantryLabel.ForeColor = System.Drawing.Color.Orange;
+            this.InfantryLabel.Location = new System.Drawing.Point(109, 540);
+            this.InfantryLabel.Name = "InfantryLabel";
+            this.InfantryLabel.Size = new System.Drawing.Size(172, 27);
+            this.InfantryLabel.TabIndex = 22;
+            this.InfantryLabel.Text = "You bought : 0";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.BackColor = System.Drawing.Color.Transparent;
+            this.label12.Font = new System.Drawing.Font("Andre V", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label12.ForeColor = System.Drawing.Color.Orange;
+            this.label12.Location = new System.Drawing.Point(91, 621);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(78, 30);
+            this.label12.TabIndex = 23;
+            this.label12.Text = "Buy !";
+            // 
+            // SniperLabel
+            // 
+            this.SniperLabel.AutoSize = true;
+            this.SniperLabel.BackColor = System.Drawing.Color.Transparent;
+            this.SniperLabel.Font = new System.Drawing.Font("Andre V", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.SniperLabel.ForeColor = System.Drawing.Color.Orange;
+            this.SniperLabel.Location = new System.Drawing.Point(709, 540);
+            this.SniperLabel.Name = "SniperLabel";
+            this.SniperLabel.Size = new System.Drawing.Size(172, 27);
+            this.SniperLabel.TabIndex = 24;
+            this.SniperLabel.Text = "You bought : 0";
+            // 
+            // MercenarieLabel
+            // 
+            this.MercenarieLabel.AutoSize = true;
+            this.MercenarieLabel.BackColor = System.Drawing.Color.Transparent;
+            this.MercenarieLabel.Font = new System.Drawing.Font("Andre V", 18F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.MercenarieLabel.ForeColor = System.Drawing.Color.Orange;
+            this.MercenarieLabel.Location = new System.Drawing.Point(422, 540);
+            this.MercenarieLabel.Name = "MercenarieLabel";
+            this.MercenarieLabel.Size = new System.Drawing.Size(172, 27);
+            this.MercenarieLabel.TabIndex = 25;
+            this.MercenarieLabel.Text = "You bought : 0";
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.BackColor = System.Drawing.Color.Transparent;
+            this.label11.Font = new System.Drawing.Font("Andre V", 20.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label11.ForeColor = System.Drawing.Color.Orange;
+            this.label11.Location = new System.Drawing.Point(971, 60);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(271, 120);
+            this.label11.TabIndex = 26;
+            this.label11.Text = "HP = Hit Points\r\nRD = Ranged Damage\r\nMD = Melee Damage\r\nSPD = Speed\r\n";
+            // 
             // Shop
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.ClientSize = new System.Drawing.Size(1280, 720);
+            this.Controls.Add(this.label11);
+            this.Controls.Add(this.MercenarieLabel);
+            this.Controls.Add(this.SniperLabel);
+            this.Controls.Add(this.label12);
+            this.Controls.Add(this.InfantryLabel);
             this.Controls.Add(this.Start);
             this.Controls.Add(this.label10);
             this.Controls.Add(this.label9);
@@ -326,6 +396,11 @@
             this.Controls.SetChildIndex(this.label9, 0);
             this.Controls.SetChildIndex(this.label10, 0);
             this.Controls.SetChildIndex(this.Start, 0);
+            this.Controls.SetChildIndex(this.InfantryLabel, 0);
+            this.Controls.SetChildIndex(this.label12, 0);
+            this.Controls.SetChildIndex(this.SniperLabel, 0);
+            this.Controls.SetChildIndex(this.MercenarieLabel, 0);
+            this.Controls.SetChildIndex(this.label11, 0);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox0)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
@@ -360,5 +435,10 @@
         private System.Windows.Forms.PictureBox buyMercenarie;
         private System.Windows.Forms.PictureBox buyInfantry;
         private System.Windows.Forms.PictureBox Start;
+        private System.Windows.Forms.Label InfantryLabel;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.Label SniperLabel;
+        private System.Windows.Forms.Label MercenarieLabel;
+        private System.Windows.Forms.Label label11;
     }
 }
